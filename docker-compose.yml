@@ -1,0 +1,32 @@
+version: '2'
+services:
+  web:
+    build: frontend
+    volumes:
+      - ./frontend/web:/usr/local/apache2/htdocs/
+
+  haproxy:
+    build: haproxy
+    ports:
+     - "80:80"
+    volumes:
+     - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+     - mongo
+     - logstash
+     - web
+
+  logstash:
+    build: logstash
+    ports:
+     - "2000:2000"
+    depends_on:
+     - mongo
+
+  mongo:
+    image: mongo
+    command: mongod --rest --httpinterface
+    ports: 
+     - "27017:27017"
+     - "28017:28017"
+

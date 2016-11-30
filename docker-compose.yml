@@ -18,10 +18,21 @@ services:
 
   logstash:
     build: logstash
+    volumes:
+    - ./logstash/logstash-input.conf:/etc/logstash/logstash.conf:ro
     ports:
      - "2000:2000"
-    depends_on:
+    links:
+     - rabbitmq
+
+  logstash-mongo:
+    build: logstash
+    volumes:
+    - ./logstash/logstash-output.conf:/etc/logstash/logstash.conf:ro
+    links:
      - mongo
+     - rabbitmq
+
 
   mongo:
     image: mongo
@@ -30,3 +41,8 @@ services:
      - "27017:27017"
      - "28017:28017"
 
+  rabbitmq:
+    image: rabbitmq
+    hostname: "rabbitmq"
+    ports:
+     - "5672:5672"
